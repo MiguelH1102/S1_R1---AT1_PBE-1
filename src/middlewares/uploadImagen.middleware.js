@@ -1,4 +1,4 @@
-import createMulter from "../config/upload.multer.js";
+import createMulter from "../config/produto.multer.js";
 
 const uploadImage = createMulter({
     pasta: 'imagens',
