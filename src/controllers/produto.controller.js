@@ -1,37 +1,98 @@
 import produtoModel from "../models/produto.model.js";
 
 const produtoController =  {
-    listar:async (req, res) => {
+   listarProdutos: async (req, res) => {
         try {
-            const listagem = await produtoModel.selectAll()
-            if(!listagem || listagem.length === 0) {
-                return res.status(400).json({message: "A tabela não tem registro"})
+            const { idProduto } = req.query;
+          
+            if(idProduto){
+const produto = await produtoModel.buscarUm(idProduto);
+
+                return res.status(200).json(produto);
+            }else {
+                const produtos = await produtoModel.buscarTodos();
+                return res.status(200).json(produtos);
             }
-            res.status(200).json({message:"Dados listados", data: listagem})
-            
-            
-            
+
         } catch (error) {
-            console.error(error.message);
-            res.status(500).json({message:'Ocorreu um erro no servidor', errorMenssage:error.message})
+            console.error('erro ao listar produtos:', error);
+            res.status(500).json({ message: 'Error ao buscar produto' })
         }
     },
-     criarProduto:async (req, res) => {
+    criarProduto: async (req, res) => {
         try {
-            const {idCategoria, nomeProduto, valorProduto, vínculoImagem, dataCad} = req.body;
-            // Realizar tratamento dos dados recebidos
+    console.log (req.body)
+            const { idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad } = req.body;
 
-             if (!nomeProduto || !valorProduto || !idCategoria || !dataCad) {
-                return res.status(400).json({ message: "Dados incompletos ou inválidos" });
+            if (idCategoria == undefined || nomeProduto == undefined || valorProduto == undefined || isNaN(valorProduto) || vinculoImagem == undefined || dataCad == undefined) {
+                return res.status(400).json({ erro: 'campos OBRIGATÓRIOS não preenchidos' })
             }
 
+            await produtoModel.insert( idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad);
 
-            res.status(201).json({message:'Registro inserido com sucesso'})
+            res.status(201).json({ message: 'produto cadastrado com sucesso!' });
 
         } catch (error) {
-            console.error(error);
-        res.status(500).json({message:'Ocorreu um erro no servidor', errorMenssage:error.message});
+            console.error('erro ao cadastrar o produto!', error)
+            res.status(500).json({ error: 'erro no servidor ao cadastrar o produto' });
         }
+    },
+
+    deletarProduto: async (req, res) => {
+        try {
+
+            const { idProduto } = req.params;
+
+            await produtoModel.deletarProduto(idProduto);
+
+            res.status(200).json({ message: "Produto deletado com sucesso!" })
+
+        } catch (error) {
+            console.error('Erro ao deletar produto', error);
+            res.status(500).json({ erro: "Erro no servidor ao deletar o produto" });
+        }
+    },
+   
+    atualizarProduto: async (req, res) => {
+         try {
+        const { id } = req.params;
+        const {
+            idCategoria,
+            nomeProduto,
+            valorProduto,
+            vinculoImagem,
+            dataCad
+        } = req.body;
+
+       
+        if (!id || !idCategoria || !nomeProduto || !valorProduto) {
+            return res.status(400).json({
+                message: "Dados obrigatórios não informados."
+            });
+        }
+
+        const resultado = await produtoModel.atualizarProduto(
+            id,
+            idCategoria,
+            nomeProduto,
+            valorProduto,
+            vinculoImagem,
+            dataCad
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Produto não encontrado."
+            });
+        }
+
+
+    } catch (error) {
+        console.error("Erro no controller ao atualizar produto:", error);
+        return res.status(500).json({
+            message: "Erro interno do servidor."
+        });
+    }
     }
  }
 
