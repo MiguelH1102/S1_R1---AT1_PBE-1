@@ -45,22 +45,22 @@ import pool from "../config/db.js";
             throw error;
         }
     },
-    atualizarProduto: async (idProduto, idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad) => {
-    try {
-        const sql = `
-            UPDATE produto SET idCategoria = ?, nomeProduto = ?, valorProduto = ?, vinculoImagem = ?,dataCad = ? WHERE idProduto = ?
-        `;
-
-        const values = [idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad, idProduto];
-
-        const [rows] = await pool.execute(sql, values);
-        return rows;
-
-    } catch (error) {
-        console.error('Erro ao atualizar o produto:', error);
-        throw error;
-    }
-}
+   atualizarProduto: async (idProduto, idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad) => {
+    const sql = `
+        UPDATE produto 
+        SET idCategoria = ?, 
+            nomeProduto = ?, 
+            valorProduto = ?, 
+            vinculoImagem = ?, 
+            dataCad = ?
+        WHERE idProduto = ?
+    `;
+    
+    const values = [idCategoria, nomeProduto, valorProduto, vinculoImagem, dataCad, idProduto];
+    
+    const [rows] = await pool.execute(sql, values);
+    return rows;
+},
 }
 
     export default produtoModel;

@@ -52,22 +52,17 @@ const produto = await produtoModel.buscarUm(idProduto);
             res.status(500).json({ erro: "Erro no servidor ao deletar o produto" });
         }
     },
-   
     atualizarProduto: async (req, res) => {
-         try {
-        const { id } = req.params;
-        const {
-            idCategoria,
-            nomeProduto,
-            valorProduto,
-            vinculoImagem,
-            dataCad
+           try {
+         const idProduto = req.params.id;
+
+        const {idCategoria,nomeProduto,valorProduto,vinculoImagem,dataCad
         } = req.body;
 
-       
-        if (!id || !idCategoria || !nomeProduto || !valorProduto) {
+         if (idProduto === undefined || idCategoria === undefined || nomeProduto === undefined || valorProduto === undefined || vinculoImagem === undefined ||dataCad === undefined
+        ) {
             return res.status(400).json({
-                message: "Dados obrigatórios não informados."
+                mensagem: "Todos os campos são obrigatórios."
             });
         }
 
@@ -81,19 +76,23 @@ const produto = await produtoModel.buscarUm(idProduto);
         );
 
         if (resultado.affectedRows === 0) {
-            return res.status(404).json({
-                message: "Produto não encontrado."
+            return res.status(404).json({ 
+                mensagem: "Produto não encontrado." 
             });
         }
 
+        return res.status(200).json({ 
+            mensagem: "Produto atualizado com sucesso!" 
+        });
 
     } catch (error) {
-        console.error("Erro no controller ao atualizar produto:", error);
-        return res.status(500).json({
-            message: "Erro interno do servidor."
+        console.error("Erro ao atualizar produto:", error);
+        return res.status(500).json({ 
+            mensagem: "Erro interno do servidor." 
         });
     }
     }
+    
  }
 
  export default produtoController;
